@@ -1,30 +1,29 @@
 import React from 'react';
-import AppDispatcher from './dispatcher';
+import Reflux from 'reflux';
 
-export default class Main extends React.Component {
+import GreetingActions from './actions/greeting';
+import GreetingStore from './stores/greeting';
 
-	constructor() {
-		super();
+export default React.createClass({
 
-		// ES6 binding workaround
-		this.onButtonClicked = this.onButtonClicked.bind(this);
+	mixins: [Reflux.listenTo(GreetingStore, 'onGreetingChanged')],
 
-		// State
-		this.state = {
-			greeting: 'Hello, world',
+	getInitialState: function() {
+		return {
+			greeting: GreetingStore.greeting,
 		};
-	}
-
-	onButtonClicked() {
-		this.setState({greeting: 'Goodbye, world!'});
-	}
-
-  render() {
-		return (
-			<div>
-				<h1>{this.state.greeting}</h1>
-				<button onClick={this.onButtonClicked}>Good bye!</button>
-			</div>
-    );
-  }
-}
+	},
+	onGreetingChanged: function() {
+		console.log('hello');
+		this.setState({greeting: GreetingStore.greeting});
+	},
+	onButtonClicked: function() {
+		GreetingActions.goodbye();
+	},
+	render: function() {
+		return <div>
+			<h1>{this.state.greeting}</h1>
+			<button onClick={this.onButtonClicked}>Good bye!</button>
+		</div>
+	},
+});
